@@ -25,8 +25,8 @@ contract Bets
 	uint256 notCommission = 90;
 	uint256 defaultAffiliateCommission = 50;
 
-	// bet id => description
-	mapping(uint256 => string) public description;
+	// bet id => bet description
+	mapping(uint256 => string) public bet;
 
 	mapping(uint256 => uint256) public outcomeCount;
 
@@ -65,7 +65,7 @@ contract Bets
 
 	function createBet
 	(
-		string memory _name,
+		string memory _bet,
 		string[] memory _outcome
 	)
 	public
@@ -73,7 +73,7 @@ contract Bets
 		require(msg.sender == admin);
 
 		betCount++;
-		description[betCount] = _name;
+		bet[betCount] = _bet;
 		outcomeCount[betCount] = _outcome.length;
 		for (uint256 i = 1; i <= _outcome.length; i++)
 		{

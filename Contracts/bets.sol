@@ -36,9 +36,9 @@ contract Bets
 	(
 		uint256 => uint256
 	)
-	public betOptionCount;
+	public outcomeCount;
 
-	// bet id => option id => option
+	// bet id => outcome id => outcome
 	mapping 
 	(
 		uint256 => mapping
@@ -46,16 +46,16 @@ contract Bets
 			uint256 => string
 		)
 	)
-	public option;
+	public outcome;
 
 	// bet id => total amount betted
 	mapping
 	(
 		uint256 => uint256
 	)
-	public betTotalBetted;
+	public prizePool;
 
-	// bet id => option id => total amount betted
+	// bet id => outcome id => total amount betted
 	mapping 
 	(
 		uint256 => mapping
@@ -63,9 +63,9 @@ contract Bets
 			uint256 => uint256
 		)
 	)
-	public optionTotalBetted;
+	public outcomePool;
 
-	// bet id => option id => account => amount betted
+	// bet id => outcome id => account => amount betted
 	mapping 
 	(
 		uint256 => mapping 
@@ -76,7 +76,7 @@ contract Bets
 			)
 		)
 	)
-	public accountAmountBetted;
+	public wager;
 
 	// bet id => total amount betted
 	mapping
@@ -108,15 +108,15 @@ contract Bets
 	)
 	public affiliateOf;
 
-	mapping 
+	mapping
 	(
-		address => address
+		address => uint256
 	)
 	public affiliateCommission;
 
 	mapping 
 	(
-		address => address
+		address => uint256
 	)
 	public affiliateNotCommission;
 
@@ -124,12 +124,12 @@ contract Bets
 	(
 		address => uint256
 	)
-	public affiliateBUSD;
+	public affiliateBusd;
 
 	function createBet
 	(
 		string memory _name,
-		string[] memory _option
+		string[] memory _outcome
 	)
 	public
 	{
@@ -137,23 +137,23 @@ contract Bets
 
 		betCount++;
 		description[betCount] = _name;
-		betOptionCount[betCount] = _option.length;
-		for (uint256 i = 1; i <= _option.length; i++)
+		outcomeCount[betCount] = _outcome.length;
+		for (uint256 i = 1; i <= _outcome.length; i++)
 		{
-			option[betCount][i] = _option[i];
+			outcome[betCount][i] = _outcome[i-1];
 		}
 		status[betCount] = 1;
 	}
 
-	function placeBet(uint256 _betId, uint256 _optionId, uint256 _amount) public
+	function placeBet(uint256 _betId, uint256 _outcomeId, uint256 _amount) public
 	{
 		require(status[_betId] == 1);
 
 		ERC20(token).transferFrom(msg.sender, address(this), _amount);
 
-		betTotalBetted[_betId] += _amount;
-		optionTotalBetted[_betId][_optionId] += _amount;
-		accountAmountBetted[_betId][_optionId][msg.sender] += _amount;
+		prizePool[_betId] += _amount;
+		outcomePool[_betId][_outcomeId] += _amount;
+		wager[_betId][_outcomeId][msg.sender] += _amount;
 	}
 
 	function closeBet(uint256 _betId) public
@@ -163,15 +163,15 @@ contract Bets
 		status[_betId] = 2;
 	}
 
-	function setResult(uint256 _betId, uint256 _optionId) public
+	function setResult(uint256 _betId, uint256 _outcomeId) public
 	{
 		require(status[_betId] == 2);
 		require(msg.sender == admin);
 
-		result[_betId] = _optionId;
+		result[_betId] = _outcomeId;
 		status[_betId] = 3;
 		// this must be done in claim reward stage because of affiliate system
-		//unlockedBusd += (betTotalBetted[_betId] - optionTotalBetted[_betId][result[_betId]]) * commission / denominator;
+		//unlockedBusd += (prizePool[_betId] - outcomePool[_betId][result[_betId]]) * commission / denominator;
 	}
 
 	function claimReward(uint256 _betId) public
@@ -180,22 +180,22 @@ contract Bets
 		require(!hasClaimed[_betId][msg.sender]);
 
 		hasClaimed[_betId][msg.sender] = true;
-		if (affiliate[msg.sender] == address(0))
+		if (affiliateOf[msg.sender] == address(0))
 		{
-			ERC20(token).transfer(msg.sender, accountAmountBetted[_betId][result[_betId]][msg.sender]+(((betTotalBetted[_betId]-optionTotalBetted[_betId][result[_betId]])*accountAmountBetted[_betId][result[_betId]][msg.sender]*notCommission)/(optionTotalBetted[_betId][result[_betId]]*100)));
-			unlockedBusd = ((betTotalBetted[_betId]-optionTotalBetted[_betId][result[_betId]])*accountAmountBetted[_betId][result[_betId]][msg.sender]*commission)/(optionTotalBetted[_betId][result[_betId]]*100);
+			ERC20(token).transfer(msg.sender, wager[_betId][result[_betId]][msg.sender]+(((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*notCommission)/(outcomePool[_betId][result[_betId]]*100)));
+			unlockedBusd = ((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*commission)/(outcomePool[_betId][result[_betId]]*100);
 		}
 		else
 		{
-			ERC20(token).transfer(msg.sender, accountAmountBetted[_betId][result[_betId]][msg.sender]+(((betTotalBetted[_betId]-optionTotalBetted[_betId][result[_betId]])*accountAmountBetted[_betId][result[_betId]][msg.sender]*notCommission)/(optionTotalBetted[_betId][result[_betId]]*100)));
-			unlockedBusd = ((betTotalBetted[_betId]-optionTotalBetted[_betId][result[_betId]])*accountAmountBetted[_betId][result[_betId]][msg.sender]*commission*affiliateNotCommission[affiliate[msg.sender]])/(optionTotalBetted[_betId][result[_betId]]*100*100);
-			affiliateBusd[affiliate[msg.sender]] = ((betTotalBetted[_betId]-optionTotalBetted[_betId][result[_betId]])*accountAmountBetted[_betId][result[_betId]][msg.sender]*commission*affiliateCommission[affiliate[msg.sender]])/(optionTotalBetted[_betId][result[_betId]]*100*100);
+			ERC20(token).transfer(msg.sender, wager[_betId][result[_betId]][msg.sender]+(((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*notCommission)/(outcomePool[_betId][result[_betId]]*100)));
+			unlockedBusd = ((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*commission*affiliateNotCommission[affiliateOf[msg.sender]])/(outcomePool[_betId][result[_betId]]*100*100);
+			affiliateBusd[affiliateOf[msg.sender]] = ((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*commission*affiliateCommission[affiliateOf[msg.sender]])/(outcomePool[_betId][result[_betId]]*100*100);
 		}
 	}
 
 	function setCommission
 	(
-		uint256 _commission,
+		uint256 _commission
 	)
 	public
 	{
@@ -207,7 +207,7 @@ contract Bets
 
 	function setAffiliate(address _affiliate) public
 	{
-		affiliate[msg.sender] == _affiliate;
+		affiliateOf[msg.sender] = _affiliate;
 	}
 
 	function setAffiliateCommission(address _affiliate, uint256 _commission) public

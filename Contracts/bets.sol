@@ -61,11 +61,7 @@ contract Bets
 
 	mapping(address => uint256) public affiliateNotCommission;
 
-	mapping 
-	(
-		address => uint256
-	)
-	public affiliateBusd;
+	mapping(address => uint256) public affiliateBusd;
 
 	function createBet
 	(

@@ -25,100 +25,41 @@ contract Bets
 	uint256 notCommission = 90;
 	uint256 defaultAffiliateCommission = 50;
 
-	// bet id => name
-	mapping 
-	(
-		uint256 => string
-	)
-	public description;
+	// bet id => description
+	mapping(uint256 => string) public description;
 
-	mapping 
-	(
-		uint256 => uint256
-	)
-	public outcomeCount;
+	mapping(uint256 => uint256) public outcomeCount;
 
-	// bet id => outcome id => outcome
-	mapping 
-	(
-		uint256 => mapping
-		(
-			uint256 => string
-		)
-	)
-	public outcome;
+	// bet id => outcome id => outcome description
+	mapping(uint256 => mapping(uint256 => string)) public outcome;
 
 	// bet id => total amount betted
-	mapping
-	(
-		uint256 => uint256
-	)
-	public prizePool;
+	mapping(uint256 => uint256)public prizePool;
 
-	// bet id => outcome id => total amount betted
-	mapping 
-	(
-		uint256 => mapping
-		(
-			uint256 => uint256
-		)
-	)
-	public outcomePool;
+	// bet id => outcome id => total amount betted on each outcome
+	mapping(uint256 => mapping(uint256 => uint256)) public outcomePool;
 
-	// bet id => outcome id => account => amount betted
-	mapping 
-	(
-		uint256 => mapping 
-		(
-			uint256 => mapping 
-			(
-				address => uint256
-			)
-		)
-	)
-	public wager;
+	// bet id => outcome id => account => amount betted on each outcome
+	mapping(uint256 => mapping(uint256 => mapping(address => uint256))) public wager;
 
-	// bet id => total amount betted
-	mapping
-	(
-		uint256 => uint256
-	)
-	public result;
+	// bet id => winning outcome
+	mapping(uint256 => uint256) public result;
 
-	// bet id => total amount betted
-	mapping
-	(
-		uint256 => uint256
-	)
-	public status;
+	// bet id => bet status
+	// 0 = not started
+	// 1 = betting stage
+	// 2 = waiting stage
+	// 3 = finished
+	mapping(uint256 => uint256) public status;
 
-	// bet id => total amount betted
-	mapping
-	(
-		uint256 => mapping  
-		(
-			address => bool
-		)
-	)
-	public hasClaimed;
+	// bet id => has address claimed rewards for specific bet?
+	mapping(uint256 => mapping(address => bool)) public hasClaimed;
 
-	mapping 
-	(
-		address => address
-	)
-	public affiliateOf;
+	mapping(address => address) public affiliateOf;
 
-	mapping
-	(
-		address => uint256
-	)
-	public affiliateCommission;
+	mapping(address => uint256) public affiliateCommission;
 
-	mapping 
-	(
-		address => uint256
-	)
-	public affiliateNotCommission;
+	mapping(address => uint256) public affiliateNotCommission;
 
 	mapping 
 	(

@@ -1,83 +1,10 @@
 const contractABI = 
 [
   {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "accountAmountBetted",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [],
-    "name": "betCount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "betOptionCount",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "betTotalBetted",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
+    "name": "affiliateWithdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -110,12 +37,12 @@ const contractABI =
     "inputs": [
       {
         "internalType": "string",
-        "name": "_name",
+        "name": "_bet",
         "type": "string"
       },
       {
         "internalType": "string[]",
-        "name": "_option",
+        "name": "_outcome",
         "type": "string[]"
       }
     ],
@@ -128,16 +55,204 @@ const contractABI =
     "inputs": [
       {
         "internalType": "uint256",
+        "name": "_betId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_outcomeId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "placeBet",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "registerAffiliate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_affiliate",
+        "type": "address"
+      }
+    ],
+    "name": "setAffiliate",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_affiliate",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_commission",
+        "type": "uint256"
+      }
+    ],
+    "name": "setAffiliateCommission",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_commission",
+        "type": "uint256"
+      }
+    ],
+    "name": "setCommission",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_betId",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_outcomeId",
+        "type": "uint256"
+      }
+    ],
+    "name": "setResult",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "affiliateBusd",
+    "outputs": [
+      {
+        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
     ],
-    "name": "description",
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "affiliateCommission",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "affiliateNotCommission",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "affiliateOf",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "bet",
     "outputs": [
       {
         "internalType": "string",
         "name": "",
         "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "betCount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -180,7 +295,7 @@ const contractABI =
         "type": "uint256"
       }
     ],
-    "name": "option",
+    "name": "outcome",
     "outputs": [
       {
         "internalType": "string",
@@ -197,14 +312,9 @@ const contractABI =
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
       }
     ],
-    "name": "optionTotalBetted",
+    "name": "outcomeCount",
     "outputs": [
       {
         "internalType": "uint256",
@@ -219,23 +329,43 @@ const contractABI =
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_betId",
+        "name": "",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "_optionId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_amount",
+        "name": "",
         "type": "uint256"
       }
     ],
-    "name": "placeBet",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "name": "outcomePool",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "prizePool",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -261,42 +391,6 @@ const contractABI =
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_commission",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_denominator",
-        "type": "uint256"
-      }
-    ],
-    "name": "setCommission",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_betId",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_optionId",
-        "type": "uint256"
-      }
-    ],
-    "name": "setResult",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
         "name": "",
         "type": "uint256"
       }
@@ -313,25 +407,60 @@ const contractABI =
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "withdraw",
-    "outputs": [],
-    "stateMutability": "nonpayable",
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "wager",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]
-const contractAddress = "0xe93931Af429F7Fb5363ba0F54E86d21842660D35";
-const address = "0x2813a3F7E9885091653D9D7EDA15b5a5Ed68a0c4";
-const privateKey1 = "65ea51021f4481cf73bfa5ccec80aad394bd2907021ede0e171c77260d278029";
-const web3 = new Web3("https://rpctest.meter.io");
-const contract = new web3.eth.Contract(contractABI, contractAddress);
+const contractAddress = "0x854E85bc52E287dc27a682d23DA805e8C5ee7A80";
+let addresses = [];
+let web3js = new Web3("https://rpctest.meter.io");
+const contract = new web3js.eth.Contract(contractABI, contractAddress);
 
 let bet;
 let id;
+let web3;
 
-function search()
+const asyncFunction = async () =>
 {
-  id = document.getElementsByTagName("input")[0].value;
+  web3;
+  if (window.ethereum)
+  {
+    web3 = new Web3(window.ethereum);
+    await ethereum.enable();
+  }
+
+  addresses[0] = await web3.eth.getAccounts();
+  console.log(addresses[0]);
+}
+
+const search = async () =>
+{
+  id = document.getElementsByTagName("input")[1].value;
   console.log(id);
 
   if (bet != undefined)
@@ -339,47 +468,24 @@ function search()
     bet.remove();
   }
 
-	contract.methods.status(id).call(function (err, resStatus) 
+  contract.methods.status(id).call(function (err, resStatus) 
   {
-    contract.methods.betOptionCount(id).call(function (err, resOptionCount)
+    contract.methods.outcomeCount(id).call(function (err, resOptionCount)
     {
       _displayBet(id, resOptionCount, resStatus);
     });
   });
 }
 
-function placeBet (_option, _amount)
+async function placeBet(_id, _option, _amount)
 {
-  let option = document.getElementsByTagName("input")[2].value;
-  let amount = document.getElementsByTagName("input")[1].value;
+  /*
+  let option = document.getElementsByTagName("input")[3].value;
+  let amount = document.getElementsByTagName("input")[2].value;
+  */
 
-  web3.eth.getTransactionCount(address, (err, txCount) => 
-  {
-    const txObject =
-    {
-      nonce: web3.utils.toHex(txCount),
-      chainId: 83,
-      gasLimit: web3.utils.toHex(800000),
-      gasPrice: web3.utils.toHex(web3.utils.toWei('10', 'gwei')),
-      to: contractAddress,
-      data: contract.methods.placeBet(id, option, amount).encodeABI()
-    }
-
-    const tx = new ethereumjs.Tx(txObject);
-
-    var privateKey2 = new ethereumjs.Buffer.Buffer(privateKey1, 'hex')
-
-    tx.sign(privateKey2);
-
-    const serializedTx = tx.serialize();
-
-    const raw = "0x" + serializedTx.toString("hex");
-
-    web3.eth.sendSignedTransaction(raw, (err, txHash) => 
-    {
-    console.log('err:', err, 'txHash:', txHash)
-    // Use this txHash to find the contract on Etherscan!
-    })
+  await contract.methods.placeBet(_id, _option, _amount).send({
+    from: addresses[0][0]
   });
 }
 
@@ -445,7 +551,7 @@ function _displayBet(_id, _optionCount, _status)
 	bet.appendChild(element);
 
   let description = document.createElement("p");
-  contract.methods.description(_id).call(function (err, resDescription) 
+  contract.methods.bet(_id).call(function (err, resDescription) 
   {
     description.innerHTML = resDescription;
   });
@@ -472,14 +578,14 @@ function _displayBet(_id, _optionCount, _status)
     element = document.createElement("br");
     optionContainer.appendChild(element);
 
-		contract.methods.option(_id, i+1).call(function(err, resOption)
+		contract.methods.outcome(_id, i+1).call(function(err, resOption)
     {
       option.innerHTML = option.innerHTML + resOption;
     });   
 
-    contract.methods.optionTotalBetted(_id, i+1).call(function(err, resOptionValue)
+    contract.methods.outcomePool(_id, i+1).call(function(err, resOptionValue)
     {
-      contract.methods.betTotalBetted(_id).call(function(err, resPrizePool)
+      contract.methods.prizePool(_id).call(function(err, resPrizePool)
       {
         console.log(i);
         console.log(resOptionValue + " | " + resPrizePool);
@@ -531,3 +637,33 @@ function _displayBet(_id, _optionCount, _status)
     bet.appendChild(element);
   }
 }
+
+
+
+/*
+const getWeb3 = () => 
+{
+  new Promise((resolve, reject) => {
+    window.addEventListener("load", async () => {
+      if (window.ethereum) {
+        console.log("latest mm version");
+        const web3 = new Web3(window.ethereum);
+        try {
+          await window.ethereum.enable();
+          resolve(web3);
+        } catch (error) {
+          reject (error);
+        }
+      }
+      else if (window.web3) {
+        console.log("NOT latest mm version");
+        const web3 = window.web3;
+        resolve(web3);
+      }
+      else {
+        console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
+      }
+    })
+  })
+}
+*/

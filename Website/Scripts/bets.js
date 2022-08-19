@@ -438,19 +438,22 @@ const contractABI =
 ]
 const contractAddress = "0x854E85bc52E287dc27a682d23DA805e8C5ee7A80";
 let addresses = [];
+/*
 let web3js = new Web3("https://rpctest.meter.io");
-const contract = new web3js.eth.Contract(contractABI, contractAddress);
+const contract = new web3js.eth.Contract(contractABI, contractAddress);\
+*/
 
 let bet;
 let id;
 let web3;
+let contract;
 
 const asyncFunction = async () =>
 {
-  web3;
   if (window.ethereum)
   {
     web3 = new Web3(window.ethereum);
+    contract = await new web3.eth.Contract(contractABI, 83 && contractAddress);
     await ethereum.enable();
   }
 
@@ -477,47 +480,20 @@ const search = async () =>
   });
 }
 
-async function placeBet(_id, _option, _amount)
+async function placeBet()
 {
-  /*
   let option = document.getElementsByTagName("input")[3].value;
-  let amount = document.getElementsByTagName("input")[2].value;
-  */
+  let amount = document.getElementsByTagName("input")[2].value + "000000000000000000";
 
-  await contract.methods.placeBet(_id, _option, _amount).send({
+  await contract.methods.placeBet(id, option, amount).send({
     from: addresses[0][0]
   });
 }
 
-function claimReward()
+async function claimReward()
 {
-  web3.eth.getTransactionCount(address, (err, txCount) => 
-  {
-    const txObject =
-    {
-      nonce: web3.utils.toHex(txCount),
-      chainId: 83,
-      gasLimit: web3.utils.toHex(800000),
-      gasPrice: web3.utils.toHex(web3.utils.toWei('10', 'gwei')),
-      to: contractAddress,
-      data: contract.methods.claimReward(id).encodeABI()
-    }
-
-    const tx = new ethereumjs.Tx(txObject);
-
-    var privateKey2 = new ethereumjs.Buffer.Buffer(privateKey1, 'hex')
-
-    tx.sign(privateKey2);
-
-    const serializedTx = tx.serialize();
-
-    const raw = "0x" + serializedTx.toString("hex");
-
-    web3.eth.sendSignedTransaction(raw, (err, txHash) => 
-    {
-    console.log('err:', err, 'txHash:', txHash)
-    // Use this txHash to find the contract on Etherscan!
-    })
+  await contract.methods.claimReward().send({
+    from: addresses[0][0]
   });
 }
 

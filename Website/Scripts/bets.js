@@ -437,18 +437,99 @@ const contractABI =
   }
 ]
 const contractAddress = "0x854E85bc52E287dc27a682d23DA805e8C5ee7A80";
-let addresses = [];
-/*
-let web3js = new Web3("https://rpctest.meter.io");
-const contract = new web3js.eth.Contract(contractABI, contractAddress);\
-*/
 
-let bet;
+const tokenABI = 
+[
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amountIn",
+        "type": "uint256"
+      }
+    ],
+    "name": "approve",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transfer",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "recipient",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "transferFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  }
+]
+const tokenAddress = "0x8A419Ef4941355476cf04933E90Bf3bbF2F73814";
+
+let addresses = [];
+
+let containerElement;
 let id;
 let web3;
 let contract;
+let busd;
 
-const asyncFunction = async () =>
+async function connect()
 {
   if (window.ethereum)
   {
@@ -458,26 +539,31 @@ const asyncFunction = async () =>
   }
 
   addresses[0] = await web3.eth.getAccounts();
-  console.log(addresses[0]);
 }
 
-const search = async () =>
+async function approve()
+{
+  busd = await new web3.eth.Contract(contractABI, 83 && contractAddress);
+  await contract.methods.approve(contractAddresst,"1000000000000000000000000").send({
+    from: addresses[0][0]
+  });
+}
+
+async function search()
 {
   id = document.getElementsByTagName("input")[1].value;
   console.log(id);
 
-  if (bet != undefined)
+  if (containerElement != undefined)
   {
-    bet.remove();
+    containerElement.remove();
   }
 
-  contract.methods.status(id).call(function (err, resStatus) 
-  {
-    contract.methods.outcomeCount(id).call(function (err, resOptionCount)
-    {
-      _displayBet(id, resOptionCount, resStatus);
-    });
-  });
+  let status = await contract.methods.status(id).call();
+
+  let outComeCount = await contract.methods.outcomeCount(id).call();
+
+  _displayBet(id, resOptionCount, resStatus);
 }
 
 async function placeBet()
@@ -490,6 +576,7 @@ async function placeBet()
   });
 }
 
+
 async function claimReward()
 {
   await contract.methods.claimReward().send({
@@ -497,10 +584,11 @@ async function claimReward()
   });
 }
 
+
 function _displayBet(_id, _optionCount, _status)
 {
-	bet = document.createElement("div");
-	document.getElementsByTagName("body")[0].appendChild(bet);
+	betContainerElement = document.createElement("div");
+	document.getElementsByTagName("body")[0].appendChild(betContainerElement);
 
   let element;
 
@@ -508,66 +596,53 @@ function _displayBet(_id, _optionCount, _status)
   {
     let idStatus = document.createElement("p");
     idStatus.innerHTML = "Bet #" + _id + " - Active";
-    bet.appendChild(idStatus);
+    containerElement.appendChild(idStatus);
   }
   if (_status == 2)
   {
     let idStatus = document.createElement("p");
     idStatus.innerHTML = "Bet #" + _id + " - Pending";
-    bet.appendChild(idStatus);
+    containerElement.appendChild(idStatus);
   }
   if (_status == 3)
   {
     let idStatus = document.createElement("p");
     idStatus.innerHTML = "Bet #" + _id + " - Finished";
-    bet.appendChild(idStatus);
+    containerElement.appendChild(idStatus);
   }
 
 	element = document.createElement("br");
-	bet.appendChild(element);
+	containerElement.appendChild(element);
 
-  let description = document.createElement("p");
-  contract.methods.bet(_id).call(function (err, resDescription) 
-  {
-    description.innerHTML = resDescription;
-  });
-  bet.appendChild(description);
+  let betElement = document.createElement("p");
+  let bet = await contract.methods.bet(_id).call(); 
+  betElement.innerHTML = bet;
+  containerElement.appendChild(betElement);
 
 	element = document.createElement("br");
-	bet.appendChild(element);
-
-  let optionContainer = document.createElement("div");
-  bet.appendChild(optionContainer);
+	containerElement.appendChild(element);
 
 	for (i = 0; i < _optionCount; i++)
 	{
     let option = document.createElement("p");
     option.innerHTML = "(" + (i+1) + ") ";
-    optionContainer.appendChild(option);
+    containerElement.appendChild(option);
 
     element = document.createElement("br");
-    optionContainer.appendChild(element);
+    containerElement.appendChild(element);
     
     let optionStats = document.createElement("p");
-    optionContainer.appendChild(optionStats);
+    containerElement.appendChild(optionStats);
 
     element = document.createElement("br");
-    optionContainer.appendChild(element);
+    containerElement.appendChild(element);
 
-		contract.methods.outcome(_id, i+1).call(function(err, resOption)
-    {
-      option.innerHTML = option.innerHTML + resOption;
-    });   
+		let outcome = await contract.methods.outcome(_id, i+1).call();
+    option.innerHTML = outcome; 
 
-    contract.methods.outcomePool(_id, i+1).call(function(err, resOptionValue)
-    {
-      contract.methods.prizePool(_id).call(function(err, resPrizePool)
-      {
-        console.log(i);
-        console.log(resOptionValue + " | " + resPrizePool);
-        optionStats.innerHTML = "--- " + (Math.round(resOptionValue/resPrizePool*100)) + "% $" + (Math.round(resOptionValue/1000000000000000000));
-      });
-    });
+    let outcomePool = await contract.methods.outcomePool(_id, i+1).call();
+    let prizePool = contract.methods.prizePool(_id).call();
+    optionStats.innerHTML = "--- " + (Math.round(outcomePool/prizePool*100)) + "% $" + (Math.round(outcomePool/1000000000000000000));
 	}
 
   element = document.createElement("br");
@@ -613,33 +688,3 @@ function _displayBet(_id, _optionCount, _status)
     bet.appendChild(element);
   }
 }
-
-
-
-/*
-const getWeb3 = () => 
-{
-  new Promise((resolve, reject) => {
-    window.addEventListener("load", async () => {
-      if (window.ethereum) {
-        console.log("latest mm version");
-        const web3 = new Web3(window.ethereum);
-        try {
-          await window.ethereum.enable();
-          resolve(web3);
-        } catch (error) {
-          reject (error);
-        }
-      }
-      else if (window.web3) {
-        console.log("NOT latest mm version");
-        const web3 = window.web3;
-        resolve(web3);
-      }
-      else {
-        console.log('Non-Ethereum browser detected. You should consider trying MetaMask!');
-      }
-    })
-  })
-}
-*/

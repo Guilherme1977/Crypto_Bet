@@ -544,7 +544,7 @@ async function connect()
 async function approve()
 {
   busd = await new web3.eth.Contract(contractABI, 83 && contractAddress);
-  await contract.methods.approve(contractAddresst,"1000000000000000000000000").send({
+  await contract.methods.approve(contractAddress,"1000000000000000000000000").send({
     from: addresses[0][0]
   });
 }

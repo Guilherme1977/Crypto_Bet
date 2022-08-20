@@ -585,7 +585,7 @@ async function claimReward()
 }
 
 
-function _displayBet(_id, _optionCount, _status)
+async function _displayBet(_id, _optionCount, _status)
 {
 	betContainerElement = document.createElement("div");
 	document.getElementsByTagName("body")[0].appendChild(betContainerElement);

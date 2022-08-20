@@ -561,9 +561,9 @@ async function search()
 
   let status = await contract.methods.status(id).call();
 
-  let outComeCount = await contract.methods.outcomeCount(id).call();
+  let outcomeCount = await contract.methods.outcomeCount(id).call();
 
-  _displayBet(id, resOptionCount, resStatus);
+  _displayBet(id, outcomeCount, status);
 }
 
 async function placeBet()
@@ -587,8 +587,8 @@ async function claimReward()
 
 async function _displayBet(_id, _optionCount, _status)
 {
-	betContainerElement = document.createElement("div");
-	document.getElementsByTagName("body")[0].appendChild(betContainerElement);
+	containerElement = document.createElement("div");
+	document.getElementsByTagName("body")[0].appendChild(containerElement);
 
   let element;
 
@@ -641,50 +641,50 @@ async function _displayBet(_id, _optionCount, _status)
     option.innerHTML = outcome; 
 
     let outcomePool = await contract.methods.outcomePool(_id, i+1).call();
-    let prizePool = contract.methods.prizePool(_id).call();
+    let prizePool = await contract.methods.prizePool(_id).call();
     optionStats.innerHTML = "--- " + (Math.round(outcomePool/prizePool*100)) + "% $" + (Math.round(outcomePool/1000000000000000000));
 	}
 
   element = document.createElement("br");
-  bet.appendChild(element);
+  containerElement.appendChild(element);
 
   if (_status == 1)
   {
     element = document.createElement("p");
     element.innerHTML = "Bet $";
-    bet.appendChild(element);
+    containerElement.appendChild(element);
 
     element = document.createElement("input");
-    bet.appendChild(element);
+    containerElement.appendChild(element);
 
     element = document.createElement("p");
     element.innerHTML = "on outcome";
-    bet.appendChild(element);
+    containerElement.appendChild(element);
 
     element = document.createElement("input");
-    bet.appendChild(element);
+    containerElement.appendChild(element);
 
     element = document.createElement("br");
-    bet.appendChild(element);
+    containerElement.appendChild(element);
 
     element = document.createElement("button");
     element.setAttribute('onclick', "placeBet()");
     element.innerHTML = "Place Bet";
-    bet.appendChild(element);
+    containerElement.appendChild(element);
   }
 
   if (_status == 3)
   {
     element = document.createElement("p");
     element.innerHTML = "Claim your reward if you won!";
-    bet.appendChild(element);
+    containerElement.appendChild(element);
 
     element = document.createElement("br");
-    bet.appendChild(element);
+    containerElement.appendChild(element);
 
     element = document.createElement("button");
     element.setAttribute('onclick', "claimReward()");
     element.innerHTML = "Claim Reward";
-    bet.appendChild(element);
+    containerElement.appendChild(element);
   }
 }

@@ -527,7 +527,7 @@ let containerElement;
 let id;
 let web3;
 let contract;
-let busd;
+let token;
 
 async function connect()
 {
@@ -543,8 +543,8 @@ async function connect()
 
 async function approve()
 {
-  busd = await new web3.eth.Contract(contractABI, 83 && contractAddress);
-  await busd.methods.approve(contractAddress,"1000000000000000000000000").send({
+  token = await new web3.eth.Contract(tokenABI, 83 && tokenAddress);
+  await token.methods.approve(contractAddress,"1000000000000000000000000").send({
     from: addresses[0][0]
   });
 }

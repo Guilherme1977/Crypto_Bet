@@ -611,6 +611,8 @@ async function claimReward()
   await contract.methods.claimReward(id).send({
     from: addresses[0][0]
   });
+
+  search();
 }
 
 
@@ -719,15 +721,34 @@ async function _displayBet(_id, _optionCount, _status)
   if (_status == 3)
   {
     element = document.createElement("p");
-    element.innerHTML = "Claim your reward if you won!";
     containerElement.appendChild(element);
 
-    element = document.createElement("br");
-    containerElement.appendChild(element);
+    let hasClaimed = await contract.methods.hasClaimed(id, addresses[0][0]).call();
 
-    element = document.createElement("button");
-    element.setAttribute('onclick', "claimReward()");
-    element.innerHTML = "Claim Reward";
-    containerElement.appendChild(element);
+    if (hasClaimed)
+    {
+      element.innerHTML = "You have already claimed rewards for this bet!";
+    }
+    else
+    { 
+      let wager = await contract.methods.wager(id, await contract.methods.result(id).call(), addresses[0][0]).call();
+
+      if (wager == 0)
+      {
+        element.innerHTML = "You either did not bet on the right outcome or did not bet at all... (loser)";
+      }
+      else
+      {
+        element.innerHTML = "Claim your rewards!";
+
+        element = document.createElement("br");
+        containerElement.appendChild(element);
+
+        element = document.createElement("button");
+        element.setAttribute('onclick', "claimReward()");
+        element.innerHTML = "Claim Reward";
+        containerElement.appendChild(element);
+      }
+    }
   }
 }

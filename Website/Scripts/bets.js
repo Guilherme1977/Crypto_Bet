@@ -529,16 +529,43 @@ let web3;
 let contract;
 let token;
 
-async function connect()
+window.onload = async function()
 {
   if (window.ethereum)
   {
     web3 = new Web3(window.ethereum);
     contract = await new web3.eth.Contract(contractABI, 83 && contractAddress);
-    await ethereum.enable();
   }
 
+  await ethereum.enable();
   addresses[0] = await web3.eth.getAccounts();
+  let addressString = addresses[0][0];
+  document.getElementsByTagName("button")[0].innerHTML = 
+  addresses[0][0][0] +
+  addresses[0][0][1] + 
+  addresses[0][0][2] +
+  addresses[0][0][3] + 
+  "..." +
+  addresses[0][0][38] +
+  addresses[0][0][39] + 
+  addresses[0][0][40] +
+  addresses[0][0][41];
+}
+
+async function connect()
+{
+  await ethereum.enable();
+  addresses[0] = await web3.eth.getAccounts();
+  document.getElementsByTagName("button")[0].innerHTML = 
+    addresses[0][0][0] +
+    addresses[0][0][1] + 
+    addresses[0][0][2] +
+    addresses[0][0][3] + 
+    "..." +
+    addresses[0][0][38] +
+    addresses[0][0][39] + 
+    addresses[0][0][40] +
+    addresses[0][0][41];
 }
 
 async function approve()
@@ -574,6 +601,8 @@ async function placeBet()
   await contract.methods.placeBet(id, option, amount).send({
     from: addresses[0][0]
   });
+
+  search();
 }
 
 
@@ -592,23 +621,27 @@ async function _displayBet(_id, _optionCount, _status)
 
   let element;
 
+  let betIdElement = document.createElement("p");
+  betIdElement.innerHTML = "Bet #" + _id + " -";
+  containerElement.appendChild(betIdElement);
+
+  let statusElement = document.createElement("p");
+  containerElement.appendChild(statusElement);
+
   if (_status == 1)
   {
-    let idStatus = document.createElement("p");
-    idStatus.innerHTML = "Bet #" + _id + " - Active";
-    containerElement.appendChild(idStatus);
+    statusElement.innerHTML = "Active";
+    statusElement.setAttribute("class", "outcome");
   }
   if (_status == 2)
   {
-    let idStatus = document.createElement("p");
-    idStatus.innerHTML = "Bet #" + _id + " - Pending";
-    containerElement.appendChild(idStatus);
+    statusElement.innerHTML = "Pending";
+    statusElement.setAttribute("class", "pool");
   }
   if (_status == 3)
   {
-    let idStatus = document.createElement("p");
-    idStatus.innerHTML = "Bet #" + _id + " - Finished";
-    containerElement.appendChild(idStatus);
+    statusElement.innerHTML = "Finished";
+    statusElement.setAttribute("class", "percent");
   }
 
 	element = document.createElement("br");
@@ -624,25 +657,38 @@ async function _displayBet(_id, _optionCount, _status)
 
 	for (i = 0; i < _optionCount; i++)
 	{
-    let option = document.createElement("p");
-    option.innerHTML = "(" + (i+1) + ") ";
-    containerElement.appendChild(option);
+    let outcomeIdElement = document.createElement("p");
+    outcomeIdElement.innerHTML = "(" + (i+1) + ") ";
+    containerElement.appendChild(outcomeIdElement);
+
+    let outcomeElement = document.createElement("p");
+    let outcome = await contract.methods.outcome(_id, i+1).call();
+    outcomeElement.setAttribute("class", "outcome");
+    outcomeElement.innerHTML = outcome;
+    containerElement.appendChild(outcomeElement);
 
     element = document.createElement("br");
     containerElement.appendChild(element);
     
-    let optionStats = document.createElement("p");
-    containerElement.appendChild(optionStats);
+    let outcomePool = await contract.methods.outcomePool(_id, i+1).call();
+    let prizePool = await contract.methods.prizePool(_id).call();
+
+    let outcomeStatsElement = document.createElement("p");
+    outcomeStatsElement.innerHTML = "--- ";
+    containerElement.appendChild(outcomeStatsElement);
+
+    let outcomePercentElement = document.createElement("p");
+    outcomePercentElement.innerHTML = (Math.round(outcomePool/prizePool*100)) + "%";
+    outcomePercentElement.setAttribute("class", "percent");
+    containerElement.appendChild(outcomePercentElement);
+
+    let outcomePoolElement = document.createElement("p");
+    outcomePoolElement.innerHTML = "$" + (Math.round(outcomePool/1000000000000000000));
+    outcomePoolElement.setAttribute("class", "pool");
+    containerElement.appendChild(outcomePoolElement);
 
     element = document.createElement("br");
     containerElement.appendChild(element);
-
-		let outcome = await contract.methods.outcome(_id, i+1).call();
-    option.innerHTML = outcome; 
-
-    let outcomePool = await contract.methods.outcomePool(_id, i+1).call();
-    let prizePool = await contract.methods.prizePool(_id).call();
-    optionStats.innerHTML = "--- " + (Math.round(outcomePool/prizePool*100)) + "% $" + (Math.round(outcomePool/1000000000000000000));
 	}
 
   element = document.createElement("br");
@@ -662,9 +708,6 @@ async function _displayBet(_id, _optionCount, _status)
     containerElement.appendChild(element);
 
     element = document.createElement("input");
-    containerElement.appendChild(element);
-
-    element = document.createElement("br");
     containerElement.appendChild(element);
 
     element = document.createElement("button");

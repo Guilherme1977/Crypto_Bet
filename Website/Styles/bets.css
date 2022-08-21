@@ -2,24 +2,9 @@
 
 :root 
 {
-  --darkGrey: rgb(24,23,23);
-  --grey: rgb(59,56,56);
+  --darkGrey: rgb(32,34,37);
+  --grey: rgb(54,57,63);
   --lightGrey: rgb(150,150,150);
-
-/* grey */
-  --light: rgb(208, 206, 206);
-  --lessDark: rgb(59, 56, 55);
-  --dark: rgb(24, 23, 23);
-
-/* blue */
-  --light: rgb(190, 215, 240);
-  --lessDark: rgb(5, 64, 150);
-  --dark: rgb(0, 32, 96);
-
-/* brown */
-  --light: rgb(205, 176, 124);
-  --lessDark: rgb(100, 85, 45);
-  --dark: rgb(66, 52, 26);
 
   --green: rgb(146, 208, 80);
   --blue: rgb(0, 176, 240);
@@ -33,7 +18,7 @@
   margin: 0;
   padding: 0;
   box-sizing:border-box;
-  color: var(--dark);
+  color: white;
   font-weight: 700;
   display: inline-block;
   font-family:  "Consolas";
@@ -43,7 +28,7 @@
 
 html
 {
-  background-color: var(--light);
+  background-color: var(--grey);
 }
 
 head
@@ -63,12 +48,14 @@ header
   width: 100vw;
   height: 70px;
 
-  background-color: var(--light);
+  margin-bottom: 5px;
+
+  background-color: var(--darkGrey);
 }
 
 title
 {
-  color: var(--dark);
+  color: white;
   margin: 5px 0px 0px 10px;
 
   font-size: 40px;
@@ -85,26 +72,26 @@ p
   margin: 5px 0px 0px 10px;
 }
 
-p.option
+p.outcome
 {
-  /*color: var(--green);*/
+  color: var(--green);
 }
 
-p.percentage
+p.percent
 {
-
+  color: var(--orange);
 }
 
-p.amount
+p.pool
 {
-
+  color: var(--blue);
 }
 
 input
 {
   margin: 5px 0px 0px 10px;
-  border-radius: 5px;
-  color: var(--dark);
+  border-radius: 20px;
+  color: var(--darkGrey);
   padding:  0px 4px 0px 4px;
   text-align: center;
   width: 200px;
@@ -114,16 +101,19 @@ button
 {
   color: white;
   margin:  5px 0px 0px 10px;
-  background-color: var(--dark);
-  border-radius: 5px;
-  padding: 0px 4px 0px 4px;
-  border-color: var(--lessDark);
+  background-color: var(--darkGrey);
+  border-radius: 20px;
+  padding: 2px 12px 4px 12px;
+  border-style: none;
+  font-weight: 700;
 }
 
 .metamask
 {
   float: right;
   margin: 15px 10px 0px 0px;
+  color: var(--darkGrey);
+  background-color: white;
 }
 
 img.monkey
@@ -136,11 +126,4 @@ img.monkey
   height: 600px;
 
   z-index: 0;
-}
-
-div
-{
-  margin: 0;
-  padding: 0;
-  width: 53%;
 }

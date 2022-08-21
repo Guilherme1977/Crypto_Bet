@@ -608,7 +608,7 @@ async function placeBet()
 
 async function claimReward()
 {
-  await contract.methods.claimReward().send({
+  await contract.methods.claimReward(id).send({
     from: addresses[0][0]
   });
 }

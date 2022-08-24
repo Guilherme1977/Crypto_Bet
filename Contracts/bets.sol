@@ -119,14 +119,14 @@ contract Bets
 		hasClaimed[_betId][msg.sender] = true;
 		if (affiliateOf[msg.sender] == address(0))
 		{
-			ERC20(token).transfer(msg.sender, wager[_betId][result[_betId]][msg.sender]+(((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*notCommission)/(outcomePool[_betId][result[_betId]]*100)));
 			unlockedBusd = ((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*commission)/(outcomePool[_betId][result[_betId]]*100);
+			ERC20(token).transfer(msg.sender, wager[_betId][result[_betId]][msg.sender]+(((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*notCommission)/(outcomePool[_betId][result[_betId]]*100)));
 		}
 		else
 		{
-			ERC20(token).transfer(msg.sender, wager[_betId][result[_betId]][msg.sender]+(((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*notCommission)/(outcomePool[_betId][result[_betId]]*100)));
 			unlockedBusd = ((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*commission*affiliateNotCommission[affiliateOf[msg.sender]])/(outcomePool[_betId][result[_betId]]*100*100);
 			affiliateBusd[affiliateOf[msg.sender]] = ((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*commission*affiliateCommission[affiliateOf[msg.sender]])/(outcomePool[_betId][result[_betId]]*100*100);
+			ERC20(token).transfer(msg.sender, wager[_betId][result[_betId]][msg.sender]+(((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*notCommission)/(outcomePool[_betId][result[_betId]]*100)));
 		}
 	}
 
@@ -164,14 +164,16 @@ contract Bets
 	function withdraw() public
 	{
 		require(msg.sender == admin);
- 
-		ERC20(token).transfer(admin, unlockedBusd);
+ 		
+ 		uint256 temp = unlockedBusd;
 		unlockedBusd = 0;
+		ERC20(token).transfer(admin, temp);
 	}
 
 	function affiliateWithdraw() public
 	{
-		ERC20(token).transfer(msg.sender, affiliateBusd[msg.sender]);
+		temp = affiliateBusd[msg.sender];
 		affiliateBusd[msg.sender] = 0;
+		ERC20(token).transfer(msg.sender, temp);
 	}
 }

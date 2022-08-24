@@ -521,7 +521,7 @@ const tokenABI =
 ]
 const tokenAddress = "0x8A419Ef4941355476cf04933E90Bf3bbF2F73814";
 
-let addresses = [];
+let accounts = [];
 
 let containerElement;
 let id;
@@ -538,48 +538,49 @@ window.onload = async function()
   }
 
   await ethereum.enable();
-  addresses[0] = await web3.eth.getAccounts();
-  let addressString = addresses[0][0];
-  document.getElementsByTagName("button")[0].innerHTML = 
-  addresses[0][0][0] +
-  addresses[0][0][1] + 
-  addresses[0][0][2] +
-  addresses[0][0][3] + 
-  "..." +
-  addresses[0][0][38] +
-  addresses[0][0][39] + 
-  addresses[0][0][40] +
-  addresses[0][0][41];
+  accounts = await web3.eth.getAccounts();
+  updateInterface();
 }
+
+var accountInterval = setInterval(async function() 
+{
+  if (web3 != undefined)
+  {
+    let tempAccount = [];
+    if (window.ethereum.selectedAddress !== null)
+    {
+      tempAccount[0] = web3.utils.toChecksumAddress(window.ethereum.selectedAddress);
+    }
+    
+    if (tempAccount[0] !== accounts[0]) 
+    {
+      if (web3.utils.isAddress(tempAccount[0]))
+      {
+        accounts[0] = web3.utils.toChecksumAddress(window.ethereum.selectedAddress);
+      }
+      updateInterface();
+    }
+  }
+}, 100);
 
 async function connect()
 {
   await ethereum.enable();
-  addresses[0] = await web3.eth.getAccounts();
-  document.getElementsByTagName("button")[0].innerHTML = 
-    addresses[0][0][0] +
-    addresses[0][0][1] + 
-    addresses[0][0][2] +
-    addresses[0][0][3] + 
-    "..." +
-    addresses[0][0][38] +
-    addresses[0][0][39] + 
-    addresses[0][0][40] +
-    addresses[0][0][41];
+  accounts = await web3.eth.getAccounts();
+  updateInterface();
 }
 
 async function approve()
 {
   token = await new web3.eth.Contract(tokenABI, 83 && tokenAddress);
   await token.methods.approve(contractAddress,"1000000000000000000000000").send({
-    from: addresses[0][0]
+    from: accounts[0]
   });
 }
 
 async function search()
 {
   id = document.getElementsByTagName("input")[1].value;
-  console.log(id);
 
   if (containerElement != undefined)
   {
@@ -599,7 +600,7 @@ async function placeBet()
   let amount = document.getElementsByTagName("input")[2].value + "000000000000000000";
 
   await contract.methods.placeBet(id, option, amount).send({
-    from: addresses[0][0]
+    from: accounts[0]
   });
 
   search();
@@ -609,12 +610,38 @@ async function placeBet()
 async function claimReward()
 {
   await contract.methods.claimReward(id).send({
-    from: addresses[0][0]
+    from: accounts[0]
   });
 
   search();
 }
 
+async function updateInterface()
+{
+  let tempAccount = [];
+  if (window.ethereum.selectedAddress !== null)
+  {
+    tempAccount[0] = web3.utils.toChecksumAddress(window.ethereum.selectedAddress);
+  }
+
+  if (!tempAccount.length) 
+  {
+    document.getElementsByTagName("button")[0].innerHTML = "Connect Wallet";
+  }
+  else
+  {
+    document.getElementsByTagName("button")[0].innerHTML = 
+    accounts[0][0] +
+    accounts[0][1] + 
+    accounts[0][2] +
+    accounts[0][3] + 
+    "..." +
+    accounts[0][38] +
+    accounts[0][39] + 
+    accounts[0][40] +
+    accounts[0][41];
+  }
+}
 
 async function _displayBet(_id, _optionCount, _status)
 {
@@ -723,7 +750,7 @@ async function _displayBet(_id, _optionCount, _status)
     element = document.createElement("p");
     containerElement.appendChild(element);
 
-    let hasClaimed = await contract.methods.hasClaimed(id, addresses[0][0]).call();
+    let hasClaimed = await contract.methods.hasClaimed(id, accounts[0]).call();
 
     if (hasClaimed)
     {
@@ -731,7 +758,7 @@ async function _displayBet(_id, _optionCount, _status)
     }
     else
     { 
-      let wager = await contract.methods.wager(id, await contract.methods.result(id).call(), addresses[0][0]).call();
+      let wager = await contract.methods.wager(id, await contract.methods.result(id).call(), accounts[0]).call();
 
       if (wager == 0)
       {

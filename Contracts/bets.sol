@@ -3,6 +3,8 @@ pragma solidity ^0.8.6;
 
 interface ERC20 
 {
+	 function allowance(address owner, address spender) external view returns (uint256);
+
 	function transfer(address recipient, uint256 amount) external;
 
 	function transferFrom(address sender, address recipient, uint256 amount) external;	
@@ -50,10 +52,14 @@ contract Bets
 	// 1 = betting stage
 	// 2 = waiting stage
 	// 3 = finished
+	// 4 = cancelled
 	mapping(uint256 => uint256) public status;
 
 	// bet id => has address claimed rewards for specific bet?
 	mapping(uint256 => mapping(address => bool)) public hasClaimed;
+
+    // bet id => has address claimed rewards for specific bet?
+	mapping(uint256 => mapping(address => bool)) public hasWithdrawn;
 
 	mapping(address => address) public affiliateOf;
 
@@ -98,6 +104,30 @@ contract Bets
 		require(msg.sender == admin);
 
 		status[_betId] = 2;
+	}
+
+	function cancel(uint256 _betId) public
+	{
+		require(status[_betId] == 1 || status[_betId] == 2);
+
+		status[_betId] = 4;
+	}
+
+	function withdraw(uint256 _betId) public
+	{
+		require(status[_betId] == 4);
+		require(!hasWithdrawn[_betId][msg.sender]);
+
+		hasWithdrawn[_betId][msg.sender] = true;
+
+		uint256 withdrawAmount;
+
+		for (uint256 i = 0; i < outcomeCount[_betId]; i++)
+		{
+			withdrawAmount += wager[_betId][i+1][msg.sender];
+		}
+
+		ERC20(token).transfer(msg.sender, withdrawAmount);
 	}
 
 	function setResult(uint256 _betId, uint256 _outcomeId) public
@@ -161,7 +191,7 @@ contract Bets
 		affiliateNotCommission[msg.sender] = 100-defaultAffiliateCommission;
 	}
 
-	function withdraw() public
+	function adminWithdraw() public
 	{
 		require(msg.sender == admin);
  		
@@ -172,7 +202,7 @@ contract Bets
 
 	function affiliateWithdraw() public
 	{
-		temp = affiliateBusd[msg.sender];
+		uint256 temp = affiliateBusd[msg.sender];
 		affiliateBusd[msg.sender] = 0;
 		ERC20(token).transfer(msg.sender, temp);
 	}

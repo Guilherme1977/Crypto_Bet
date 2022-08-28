@@ -2,7 +2,27 @@ const contractABI =
 [
   {
     "inputs": [],
+    "name": "adminWithdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "affiliateWithdraw",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_betId",
+        "type": "uint256"
+      }
+    ],
+    "name": "cancel",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -144,7 +164,13 @@ const contractABI =
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "_betId",
+        "type": "uint256"
+      }
+    ],
     "name": "withdraw",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -272,6 +298,30 @@ const contractABI =
       }
     ],
     "name": "hasClaimed",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "hasWithdrawn",
     "outputs": [
       {
         "internalType": "bool",
@@ -436,10 +486,34 @@ const contractABI =
     "type": "function"
   }
 ]
-const contractAddress = "0x854E85bc52E287dc27a682d23DA805e8C5ee7A80";
+const contractAddress = "0x56c2D2353597016c2571603417C90A41917b855e";
 
 const tokenABI = 
 [
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "spender",
+        "type": "address"
+      }
+    ],
+    "name": "allowance",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
   {
     "inputs": [
       {
@@ -535,6 +609,7 @@ window.onload = async function()
   {
     web3 = new Web3(window.ethereum);
     contract = await new web3.eth.Contract(contractABI, 83 && contractAddress);
+    token = await new web3.eth.Contract(tokenABI, 83 && tokenAddress);
   }
 
   await ethereum.enable();
@@ -572,14 +647,36 @@ async function connect()
 
 async function approve()
 {
-  token = await new web3.eth.Contract(tokenABI, 83 && tokenAddress);
   await token.methods.approve(contractAddress,"1000000000000000000000000").send({
     from: accounts[0]
   });
+
+  let hasApproved = await token.methods.allowance(accounts[0], contractAddress).call();
+
+  if (hasApproved > 0)
+  {
+    document.getElementsByTagName("button")[4].remove();
+    element = document.createElement("button");
+    element.setAttribute('onclick', "placeBet()");
+    element.innerHTML = "Place Bet";
+    containerElement.appendChild(element);
+  }
+  else
+  {
+    element = document.createElement("button");
+    element.setAttribute('onclick', "approve()");
+    element.innerHTML = "Approve $BUSD";
+    containerElement.appendChild(element);
+  }
 }
 
 async function search()
 {
+  if (document.getElementsByTagName("input")[1].value == "")
+  {
+    return;
+  }
+
   id = document.getElementsByTagName("input")[1].value;
 
   if (containerElement != undefined)
@@ -641,6 +738,8 @@ async function updateInterface()
     accounts[0][40] +
     accounts[0][41];
   }
+
+  search();
 }
 
 async function _displayBet(_id, _optionCount, _status)
@@ -739,10 +838,22 @@ async function _displayBet(_id, _optionCount, _status)
     element = document.createElement("input");
     containerElement.appendChild(element);
 
-    element = document.createElement("button");
-    element.setAttribute('onclick', "placeBet()");
-    element.innerHTML = "Place Bet";
-    containerElement.appendChild(element);
+    let hasApproved = await token.methods.allowance(accounts[0], contractAddress).call();
+
+    if (hasApproved > 0)
+    {
+      element = document.createElement("button");
+      element.setAttribute('onclick', "placeBet()");
+      element.innerHTML = "Place Bet";
+      containerElement.appendChild(element);
+    }
+    else
+    {
+      element = document.createElement("button");
+      element.setAttribute('onclick', "approve()");
+      element.innerHTML = "Approve $BUSD";
+      containerElement.appendChild(element);
+    }
   }
 
   if (_status == 3)

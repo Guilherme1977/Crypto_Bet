@@ -29,6 +29,7 @@
 html
 {
   background-color: var(--grey);
+  width: 100vw;
 }
 
 head
@@ -67,9 +68,20 @@ br
   color: white;
 }
 
+br.affiliate
+{
+  float: right;
+}
+
 p
 {
   margin: 5px 0px 0px 10px;
+}
+
+div.affiliate
+{
+  float: right;
+  margin-right: 5px;
 }
 
 p.outcome

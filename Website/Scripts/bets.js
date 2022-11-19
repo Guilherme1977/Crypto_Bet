@@ -759,17 +759,22 @@ async function _displayBet(_id, _optionCount, _status)
   if (_status == 1)
   {
     statusElement.innerHTML = "Active";
-    statusElement.setAttribute("class", "outcome");
+    statusElement.setAttribute("class", "green");
   }
   if (_status == 2)
   {
     statusElement.innerHTML = "Pending";
-    statusElement.setAttribute("class", "pool");
+    statusElement.setAttribute("class", "blue");
   }
   if (_status == 3)
   {
     statusElement.innerHTML = "Finished";
-    statusElement.setAttribute("class", "percent");
+    statusElement.setAttribute("class", "orange");
+  }
+  if (_status == 4)
+  {
+    statusElement.innerHTML = "Cancelled";
+    statusElement.setAttribute("class", "red");
   }
 
 	element = document.createElement("br");
@@ -791,7 +796,6 @@ async function _displayBet(_id, _optionCount, _status)
 
     let outcomeElement = document.createElement("p");
     let outcome = await contract.methods.outcome(_id, i+1).call();
-    outcomeElement.setAttribute("class", "outcome");
     outcomeElement.innerHTML = outcome;
     containerElement.appendChild(outcomeElement);
 
@@ -800,6 +804,7 @@ async function _displayBet(_id, _optionCount, _status)
     
     let outcomePool = await contract.methods.outcomePool(_id, i+1).call();
     let prizePool = await contract.methods.prizePool(_id).call();
+    let wager = await contract.methods.wager(_id, i+1, accounts[0]).call();
 
     let outcomeStatsElement = document.createElement("p");
     outcomeStatsElement.innerHTML = "--- ";
@@ -807,13 +812,21 @@ async function _displayBet(_id, _optionCount, _status)
 
     let outcomePercentElement = document.createElement("p");
     outcomePercentElement.innerHTML = (Math.round(outcomePool/prizePool*100)) + "%";
-    outcomePercentElement.setAttribute("class", "percent");
+    outcomePercentElement.setAttribute("class", "orange");
     containerElement.appendChild(outcomePercentElement);
 
     let outcomePoolElement = document.createElement("p");
     outcomePoolElement.innerHTML = "$" + (Math.round(outcomePool/1000000000000000000));
-    outcomePoolElement.setAttribute("class", "pool");
+    outcomePoolElement.setAttribute("class", "blue");
     containerElement.appendChild(outcomePoolElement);
+
+    let wagerElement = document.createElement("p");
+    wagerElement.innerHTML = "$" + (Math.round(wager/1000000000000000000));
+    if (wager > 0)
+    {
+      wagerElement.setAttribute("class", "green");
+    }
+    containerElement.appendChild(wagerElement);
 
     element = document.createElement("br");
     containerElement.appendChild(element);

@@ -25,7 +25,6 @@ contract Bets
 	uint256 unlockedBusd;
 	uint256 commission = 10;
 	uint256 notCommission = 90;
-	uint256 defaultAffiliateCommission = 50;
 
 	// bet id => bet description
 	mapping(uint256 => string) public bet;
@@ -60,14 +59,6 @@ contract Bets
 
     // bet id => has address claimed rewards for specific bet?
 	mapping(uint256 => mapping(address => bool)) public hasWithdrawn;
-
-	mapping(address => address) public affiliateOf;
-
-	mapping(address => uint256) public affiliateCommission;
-
-	mapping(address => uint256) public affiliateNotCommission;
-
-	mapping(address => uint256) public affiliateBusd;
 
 	function createBet
 	(
@@ -137,8 +128,8 @@ contract Bets
 
 		result[_betId] = _outcomeId;
 		status[_betId] = 3;
-		// this must be done in claim reward stage because of affiliate system
-		//unlockedBusd += (prizePool[_betId] - outcomePool[_betId][result[_betId]]) * commission / denominator;
+
+		unlockedBusd += (prizePool[_betId] - outcomePool[_betId][result[_betId]]) * commission / outcomePool[_betId][result[_betId]] * 100);
 	}
 
 	function claimReward(uint256 _betId) public
@@ -147,17 +138,9 @@ contract Bets
 		require(!hasClaimed[_betId][msg.sender]);
 
 		hasClaimed[_betId][msg.sender] = true;
-		if (affiliateOf[msg.sender] == address(0))
-		{
-			unlockedBusd = ((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*commission)/(outcomePool[_betId][result[_betId]]*100);
-			ERC20(token).transfer(msg.sender, wager[_betId][result[_betId]][msg.sender]+(((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*notCommission)/(outcomePool[_betId][result[_betId]]*100)));
-		}
-		else
-		{
-			unlockedBusd = ((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*commission*affiliateNotCommission[affiliateOf[msg.sender]])/(outcomePool[_betId][result[_betId]]*100*100);
-			affiliateBusd[affiliateOf[msg.sender]] = ((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*commission*affiliateCommission[affiliateOf[msg.sender]])/(outcomePool[_betId][result[_betId]]*100*100);
-			ERC20(token).transfer(msg.sender, wager[_betId][result[_betId]][msg.sender]+(((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*notCommission)/(outcomePool[_betId][result[_betId]]*100)));
-		}
+
+		unlockedBusd += ((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*commission)/(outcomePool[_betId][result[_betId]]*100);
+		ERC20(token).transfer(msg.sender, wager[_betId][result[_betId]][msg.sender]+(((prizePool[_betId]-outcomePool[_betId][result[_betId]])*wager[_betId][result[_betId]][msg.sender]*notCommission)/(outcomePool[_betId][result[_betId]]*100)));
 	}
 
 	function setCommission
@@ -172,25 +155,6 @@ contract Bets
 		notCommission = 100 - _commission;
 	}
 
-	function setAffiliate(address _affiliate) public
-	{
-		affiliateOf[msg.sender] = _affiliate;
-	}
-
-	function setAffiliateCommission(address _affiliate, uint256 _commission) public
-	{
-		require(msg.sender == admin);
-
-		affiliateCommission[_affiliate] = _commission;
-		affiliateNotCommission[_affiliate] = 100-_commission;
-	}
-
-	function registerAffiliate() public
-	{
-		affiliateCommission[msg.sender] = defaultAffiliateCommission;
-		affiliateNotCommission[msg.sender] = 100-defaultAffiliateCommission;
-	}
-
 	function adminWithdraw() public
 	{
 		require(msg.sender == admin);
@@ -198,12 +162,5 @@ contract Bets
  		uint256 temp = unlockedBusd;
 		unlockedBusd = 0;
 		ERC20(token).transfer(admin, temp);
-	}
-
-	function affiliateWithdraw() public
-	{
-		uint256 temp = affiliateBusd[msg.sender];
-		affiliateBusd[msg.sender] = 0;
-		ERC20(token).transfer(msg.sender, temp);
 	}
 }

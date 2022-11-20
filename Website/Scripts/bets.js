@@ -672,12 +672,12 @@ async function approve()
 
 async function search()
 {
-  if (document.getElementsByTagName("input")[1].value == "")
+  if (document.getElementsByTagName("input")[0].value == "")
   {
     return;
   }
 
-  id = document.getElementsByTagName("input")[1].value;
+  id = document.getElementsByTagName("input")[0].value;
 
   if (containerElement != undefined)
   {
@@ -693,8 +693,8 @@ async function search()
 
 async function placeBet()
 {
-  let option = document.getElementsByTagName("input")[3].value;
-  let amount = document.getElementsByTagName("input")[2].value + "000000000000000000";
+  let option = document.getElementsByTagName("input")[2].value;
+  let amount = document.getElementsByTagName("input")[1].value + "000000000000000000";
 
   await contract.methods.placeBet(id, option, amount).send({
     from: accounts[0]
